@@ -1,19 +1,66 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
+    <EditText
+        android:id="@+id/editText"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:hint="Enter text here"
+        android:inputType="text" />
+
     <TextView
-        android:id="@+id/textView"
+        android:id="@+id/fontPrompt"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Eulerity!"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:text="Pick a font:"
+        android:layout_below="@id/editText"/>
 
-</android.support.constraint.ConstraintLayout>
+    <Spinner
+        android:id="@+id/fontSpinner"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:layout_below="@id/fontPrompt"
+        ></Spinner>
+
+    <CheckBox
+        android:id="@+id/boldCheck"
+        android:layout_width="40dp"
+        android:layout_height="20dp"
+        android:visibility="gone"
+        android:layout_below="@id/fontSpinner"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        android:layout_toRightOf="@id/boldCheck"
+        android:layout_below="@id/fontSpinner"
+        android:text="Bold"/>
+
+    <CheckBox
+        android:id="@+id/italicCheck"
+        android:layout_width="40dp"
+        android:layout_height="20dp"
+        android:visibility="gone"
+        android:layout_below="@id/boldCheck"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        android:layout_toRightOf="@id/boldCheck"
+        android:layout_below="@id/boldCheck"
+        android:text="Italic"/>
+
+    <Button
+        android:id="@+id/submitButton"
+        android:layout_width="wrap_content"
+        android:layout_height="60dp"
+        android:layout_below="@id/italicCheck"
+        android:text="Submit"/>
+
+</RelativeLayout>

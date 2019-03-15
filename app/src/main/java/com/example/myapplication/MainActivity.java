@@ -3,6 +3,8 @@ package com.example.myapplication;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.widget.ArrayAdapter;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import org.json.JSONArray;
@@ -16,6 +18,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -30,13 +34,14 @@ public class MainActivity extends AppCompatActivity {
 
         String GetURL = "https://eulerity-hackathon.appspot.com/fonts/all";
 
-        TextView textView = findViewById(R.id.textView);
+        TextView textView = findViewById(R.id.fontPrompt);
 
         new GetArrayTask(textView).execute(GetURL);
     }
 
     private class GetArrayTask extends AsyncTask<String, Void, String> {
         private TextView textView;
+        private Spinner fontSpinner;
 
         public GetArrayTask(TextView textView) {
             this.textView = textView;
@@ -61,12 +66,23 @@ public class MainActivity extends AppCompatActivity {
                 //JSONObject main = topLevel.getJSONObject("fonts");
                 //weather = String.valueOf(main.getString("family"));
 
+                fontSpinner = (Spinner) findViewById(R.id.fontSpinner);
+                List<String> list = new ArrayList<String>();
+
                 JSONArray fonts = new JSONArray(builder.toString());
                 for(int i = 0; i < fonts.length(); i++) {
                     JSONObject font = fonts.getJSONObject(i);
-                    weather += font.getString("family");
+                    list.add(font.getString("family"));
                 }
+                final ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(MainActivity.this, android.R.layout.simple_spinner_item, list);
+                dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        fontSpinner.setAdapter(dataAdapter);
+                    }
+                });
                 urlConnection.disconnect();
                 return weather;
             } catch (IOException | JSONException e) {
