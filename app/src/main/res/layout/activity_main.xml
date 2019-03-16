@@ -26,41 +26,18 @@
         android:layout_below="@id/fontPrompt"
         ></Spinner>
 
-    <CheckBox
-        android:id="@+id/boldCheck"
-        android:layout_width="40dp"
-        android:layout_height="20dp"
-        android:visibility="gone"
-        android:layout_below="@id/fontSpinner"/>
-
-    <TextView
+    <Spinner
+        android:id="@+id/boldItalicSpinner"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:visibility="gone"
-        android:layout_toRightOf="@id/boldCheck"
+        android:layout_height="60dp"
         android:layout_below="@id/fontSpinner"
-        android:text="Bold"/>
-
-    <CheckBox
-        android:id="@+id/italicCheck"
-        android:layout_width="40dp"
-        android:layout_height="20dp"
-        android:visibility="gone"
-        android:layout_below="@id/boldCheck"/>
-
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:visibility="gone"
-        android:layout_toRightOf="@id/boldCheck"
-        android:layout_below="@id/boldCheck"
-        android:text="Italic"/>
+        ></Spinner>
 
     <Button
         android:id="@+id/submitButton"
         android:layout_width="wrap_content"
         android:layout_height="60dp"
-        android:layout_below="@id/italicCheck"
+        android:layout_below="@id/boldItalicSpinner"
         android:text="Submit"/>
 
 </RelativeLayout>

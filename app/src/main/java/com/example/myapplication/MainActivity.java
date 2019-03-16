@@ -16,9 +16,11 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 
 
@@ -26,20 +28,19 @@ public class MainActivity extends AppCompatActivity {
 
     private final static String APP_ID = "yrc247@stern.nyu.edu";
 
+    private final static String GetURL = "https://eulerity-hackathon.appspot.com/fonts/all";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        String GetURL = "https://eulerity-hackathon.appspot.com/fonts/all";
-
         TextView textView = findViewById(R.id.fontPrompt);
 
-        new GetArrayTask(textView).execute(GetURL);
+        new GetArrayTask(textView).execute();
     }
 
-    private class GetArrayTask extends AsyncTask<String, Void, String> {
+    private class GetArrayTask extends AsyncTask<Void, Void, JSONArray> {
         private TextView textView;
         private Spinner fontSpinner;
 
@@ -48,10 +49,10 @@ public class MainActivity extends AppCompatActivity {
         }
 
         @Override
-        protected String doInBackground(String... strings) {
-            String weather = "undefined";
+        protected JSONArray doInBackground(Void... arg0) {
+            JSONArray fonts = new JSONArray();
             try {
-                URL url = new URL(strings[0]);
+                URL url = new URL(GetURL);
                 HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
 
                 InputStream stream = new BufferedInputStream(urlConnection.getInputStream());
@@ -62,38 +63,65 @@ public class MainActivity extends AppCompatActivity {
                 while ((inputString = bufferedReader.readLine()) != null) {
                     builder.append(inputString);
                 }
-                //JSONObject topLevel = new JSONObject(builder.toString());
-                //JSONObject main = topLevel.getJSONObject("fonts");
-                //weather = String.valueOf(main.getString("family"));
 
-                fontSpinner = (Spinner) findViewById(R.id.fontSpinner);
-                List<String> list = new ArrayList<String>();
+                fonts = new JSONArray(builder.toString());
 
-                JSONArray fonts = new JSONArray(builder.toString());
-                for(int i = 0; i < fonts.length(); i++) {
-                    JSONObject font = fonts.getJSONObject(i);
-                    list.add(font.getString("family"));
-                }
-                final ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(MainActivity.this, android.R.layout.simple_spinner_item, list);
-                dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                urlConnection.setRequestMethod("POST");
 
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        fontSpinner.setAdapter(dataAdapter);
-                    }
-                });
+                JSONObject returnObj = buidJsonObject();
+                setPostRequestContent(urlConnection, returnObj);
+                urlConnection.connect();
+
                 urlConnection.disconnect();
-                return weather;
+                return fonts;
             } catch (IOException | JSONException e) {
                 e.printStackTrace();
             }
-            return weather;
+            return fonts;
         }
 
+        private JSONObject buidJsonObject() throws JSONException {
+
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.accumulate("APP ID", APP_ID);
+
+            return jsonObject;
+        }
+
+        private void setPostRequestContent(HttpURLConnection conn, JSONObject jsonObject) throws IOException {
+
+            OutputStream os = conn.getOutputStream();
+            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
+            writer.write(jsonObject.toString());
+            writer.flush();
+            writer.close();
+            os.close();
+        }
+
+
         @Override
-        protected void onPostExecute(String temp) {
-            textView.setText("Current weather: " + temp);
+        protected void onPostExecute(JSONArray fonts) {
+
+            try{
+                fontSpinner = findViewById(R.id.fontSpinner);
+                List<String> list = new ArrayList<>();
+
+                for(int i = 0; i < fonts.length(); i++) {
+                    JSONObject font = fonts.getJSONObject(i);
+                    String fontName = font.getString("family");
+                    list.add(fontName);
+                }
+
+                LinkedHashSet<String> hashSet = new LinkedHashSet<>(list);
+                ArrayList<String> newList = new ArrayList<>(hashSet);
+
+                final ArrayAdapter<String> dataAdapter = new ArrayAdapter<>(MainActivity.this, android.R.layout.simple_spinner_item, newList);
+                dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                fontSpinner.setAdapter(dataAdapter);
+
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
         }
     }
 }
