@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
-import android.widget.TextView;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -16,7 +15,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
@@ -35,17 +33,16 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        TextView textView = findViewById(R.id.fontPrompt);
+        Spinner fontSpinner = findViewById(R.id.fontSpinner);
 
-        new GetArrayTask(textView).execute();
+        new GetArrayTask(fontSpinner).execute();
     }
 
     private class GetArrayTask extends AsyncTask<Void, Void, JSONArray> {
-        private TextView textView;
         private Spinner fontSpinner;
 
-        public GetArrayTask(TextView textView) {
-            this.textView = textView;
+        public GetArrayTask(Spinner fontSpinner) {
+            this.fontSpinner = fontSpinner;
         }
 
         @Override
@@ -66,12 +63,6 @@ public class MainActivity extends AppCompatActivity {
 
                 fonts = new JSONArray(builder.toString());
 
-                urlConnection.setRequestMethod("POST");
-
-                JSONObject returnObj = buidJsonObject();
-                setPostRequestContent(urlConnection, returnObj);
-                urlConnection.connect();
-
                 urlConnection.disconnect();
                 return fonts;
             } catch (IOException | JSONException e) {
@@ -79,25 +70,6 @@ public class MainActivity extends AppCompatActivity {
             }
             return fonts;
         }
-
-        private JSONObject buidJsonObject() throws JSONException {
-
-            JSONObject jsonObject = new JSONObject();
-            jsonObject.accumulate("APP ID", APP_ID);
-
-            return jsonObject;
-        }
-
-        private void setPostRequestContent(HttpURLConnection conn, JSONObject jsonObject) throws IOException {
-
-            OutputStream os = conn.getOutputStream();
-            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
-            writer.write(jsonObject.toString());
-            writer.flush();
-            writer.close();
-            os.close();
-        }
-
 
         @Override
         protected void onPostExecute(JSONArray fonts) {
